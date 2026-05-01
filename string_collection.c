@@ -56,6 +56,66 @@ DynamicArray* str_create_from_cstring(const char* source){
     return str_collection;
 }
 
+DynamicArray* str_to_char(const DynamicArray* str_arr){
+    if (!str_arr){
+        fprintf(stderr, "str_to_char error (NULL pointer received)\n");
+        return NULL;
+    }
+
+    if (!is_types_equal(str_arr->el_type, get_string_info())){
+        fprintf(stderr, "str_to_char error (argument must be string type)\n");
+        return NULL;
+    }
+
+    DynamicArray* res_arr = arr_create(get_char_info(), str_arr->curr_size);
+    if (!res_arr){
+        fprintf(stderr, "str_to_char error (arr_create return NULL)\n");
+        return NULL;
+    }
+
+    for (size_t i = 0; i < str_arr ->curr_size; i++){
+        char* word = *(char**)get_elem_arr(str_arr, i);
+        if (!word) continue;
+
+        size_t word_len = strlen(word);
+        for (size_t j = 0; j < word_len; j++){
+            arr_add_el(res_arr, res_arr->curr_size, &word[j]);
+        }
+
+        if (i < str_arr->curr_size - 1){
+            char space = ' ';
+            arr_add_el(res_arr, res_arr->curr_size, &space);
+        }
+    }
+
+    return res_arr;
+}
+
+char* str_to_cstring(const DynamicArray* char_arr){
+    if (!char_arr){
+        fprintf(stderr, "str_to_cstring error (NULL pointer received)\n");
+        return NULL;
+    }
+
+    if (!is_types_equal(char_arr->el_type, get_char_info())){
+        fprintf(stderr, "str_to_cstring error (argument must be string type)\n");
+        return NULL;
+    }
+
+    char* res_str = (char*)malloc(char_arr->curr_size + 1);
+    if (!res_str){
+        fprintf(stderr, "str_to_cstring error (malloc failure)\n");
+        return NULL;
+    }
+
+    for (size_t i = 0; i < char_arr->curr_size; i++) {
+        res_str[i] = *(char*)get_elem_arr(char_arr, i);
+    }
+
+    res_str[char_arr->curr_size] = '\0';
+    return res_str;
+}
+
 DynamicArray* str_split_to_words(const DynamicArray* char_arr){
     if (!char_arr){
         fprintf(stderr, "str_split_to_words error (NULL pointer received)\n");

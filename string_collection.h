@@ -5,6 +5,8 @@
 #include "dynamic_array.h"
 
 DynamicArray* str_create_from_cstring(const char* source);
+DynamicArray* str_to_char(const DynamicArray* str_arr);
+char* str_to_cstring(const DynamicArray* char_arr);
 
 DynamicArray* str_split_to_words(const DynamicArray* char_arr);
 DynamicArray* str_concat(const DynamicArray* arr1, const DynamicArray* arr2);

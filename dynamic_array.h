@@ -21,4 +21,4 @@ bool set_elem_arr(DynamicArray* arr, const size_t index, const void* value);
 bool arr_add_el(DynamicArray* arr, const size_t index, const void* value);
 bool arr_remove_el(DynamicArray* arr, const size_t index);
 
-#endif DYNAMIC_ARRAY_H
+#endif
