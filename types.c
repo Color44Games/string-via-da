@@ -42,7 +42,12 @@ const FieldInfo* get_char_info(void){
 // ==== String type ====
 
 static void string_copy(const void* destination, const void* source){
-    *(char**) destination = *(const char**) source;
+    char* original_string = *(const char**) source;
+    if (!original_string){
+        *(char**) destination = NULL;
+    }
+    
+    *(char**) destination = strdup(original_string);
 }
 
 static void string_free_elem(const void* elem){
