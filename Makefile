@@ -1,8 +1,17 @@
-app: main.o dynamic_array.o string_collection.o types.o
-	gcc -g main.o dynamic_array.o string_collection.o types.o -o app
+OBJ_APP = main.o dynamic_array.o string_collection.o types.o
+OBJ_TEST = tests.o dynamic_array.o string_collection.o types.o
 
-test: tests.o dynamic_array.o string_collection.o types.o
-	gcc -g tests.o dynamic_array.o string_collection.o types.o -o test
+ifeq ($(OS), Windows_NT)
+	DEL_COM = del /Q *.o *.exe
+else
+	DEL_COM = rm -f *.o app test
+endif
+
+app: $(OBJ_APP)
+	gcc -g -o app $^
+
+test: $(OBJ_TEST)
+	gcc -g -o test $^
 
 tests.o:
 	gcc tests.c -c
@@ -21,5 +30,5 @@ types.o: types.c types.h field_info.h
 
 .PHONY: clean
 clean:
-	del /Q app.exe test.exe *.o
+	$(DEL_COM)
 

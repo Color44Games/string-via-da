@@ -3,10 +3,10 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-
+ 
 typedef struct FieldInfo {
     size_t elem_size;
-    void (*copy) (const void* destination, const void* sourse);
+    void (*copy) (void* destination, const void* sourse);
     void (*free_elem) (const void* elem);
     int (*compare) (const void* first_elem, const void* second_elem);
     void (*print) (const void* elem);

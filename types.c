@@ -6,7 +6,7 @@
 
 // ==== Char type ====
 
-static void char_copy(const void* destination, const void* source){
+static void char_copy(void* destination, const void* source){
     *(char*) destination = *(const char*) source;
 }
 
@@ -41,7 +41,7 @@ const FieldInfo* get_char_info(void){
 
 // ==== String type ====
 
-static void string_copy(const void* destination, const void* source){
+static void string_copy(void* destination, const void* source){
     const char* original_string = *(const char**) source;
     if (!original_string){
         *(char**) destination = NULL;

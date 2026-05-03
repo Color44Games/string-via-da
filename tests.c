@@ -5,19 +5,38 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
+
+#ifdef _WIN32
+    #include <windows.h>
+#endif
+
+//TODO: Проверка на FieldInfo
+//TODO: Больше тестов
+
+typedef int (*test_func_ptr)();
 
 static int verify(const DynamicArray* arr, const char* expected) {
     if (!arr){
         return 0;
     }
     char* actual = str_to_cstring(arr);
+    printf("%s", actual);
     int res = (strcmp(actual, expected) == 0);
     if (!res) {
         printf("\n[FAIL] Ожидалось: '%s', Получено: '%s'\n", expected, actual);
     }
     free(actual);
     return res;
+}
+
+static void check(test_func_ptr test, int* passed){
+    if (test){ 
+        printf("PASSED\n"); 
+        (*passed)++; 
+    } 
+    else{
+        printf("FAILED\n");
+    }
 }
 
 int test_trim() {
@@ -124,18 +143,21 @@ int test_cases() {
 }
 
 int main() {
-    SetConsoleCP(65001);
-    SetConsoleOutputCP(65001);
+    #ifdef _WIN32
+        SetConsoleCP(65001);
+        SetConsoleOutputCP(65001);
+    #endif
 
     int passed = 0;
-    int total = 4;
+    int total = 5;
 
     printf("==== ЗАПУСК ТЕСТОВ ====\n");
 
-    if (test_trim())           { printf("PASSED\n"); passed++; } else printf("FAILED\n");
-    if (test_range())          { printf("PASSED\n"); passed++; } else printf("FAILED\n");
-    if (test_concat())         { printf("PASSED\n"); passed++; } else printf("FAILED\n");
-    if (test_cases())          { printf("PASSED\n"); passed++; } else printf("FAILED\n");
+    check(test_trim, &passed);
+    check(test_range, &passed);
+    check(test_concat, &passed);
+    check(test_several_command, &passed);
+    check(test_cases, &passed);
 
     printf("\n==== ИТОГ: Пройдено %d из %d тестов ====\n", passed, total);
     

@@ -6,7 +6,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <windows.h>
+
+#ifdef _WIN32
+    #include <windows.h>
+#endif
+
+//TODO: Переделать меню
 
 static DynamicArray* str_read_from_stdin(){
     int c;
@@ -45,8 +50,10 @@ static void print_menu() {
 }
 
 int main(){
-    SetConsoleCP(65001);
-    SetConsoleOutputCP(65001);
+    #ifdef _WIN32
+        SetConsoleCP(65001);
+        SetConsoleOutputCP(65001);
+    #endif
 
     int command = -1;
     DynamicArray* data = NULL;

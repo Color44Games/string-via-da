@@ -7,6 +7,8 @@
 #include <ctype.h>
 #include <stdlib.h>
 
+//TODO: Убрать проверку на тип
+
 static DynamicArray* str_change_case(const DynamicArray* char_arr, int mode){
     if (!char_arr){
         fprintf(stderr, "str_to_case error (NULL pointer received)\n");
