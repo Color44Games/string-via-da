@@ -1,6 +1,7 @@
 #include "types.h"
 #include "string_collection.h"
 #include "dynamic_array.h"
+#include "field_info.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,6 +13,9 @@
 
 //TODO: Проверка на FieldInfo
 //TODO: Больше тестов
+
+static int passed = 0;
+static int failed = 0;
 
 typedef int (*test_func_ptr)();
 
@@ -29,19 +33,37 @@ static int verify(const DynamicArray* arr, const char* expected) {
     return res;
 }
 
-static void check(test_func_ptr test, int* passed){
+static void check(test_func_ptr test, int* passed, int* failed){
     if (test){ 
         printf("PASSED\n"); 
         (*passed)++; 
     } 
     else{
         printf("FAILED\n");
+        (*failed)++;
     }
 }
 
+int test_field_info_copy(){
+    const FieldInfo* char_test = get_char_info();
+    const FieldInfo* string_test = get_string_info();
+
+    char source_char = 'A';
+    char* source_str = "Abc";
+
+    char destination_char = 'Z';
+    char* destination_str = 'Zyx';
+
+    char_test->copy(&destination_char, &source_char);
+    string_test->copy(&destination_str, &source_str);
+
+    int ok1 = verify(str_create_from_cstring(&destination_str), &source_str);
+    int ok2 = verify(str_create_from_cstring(&destination_char), &source_char);
+
+    return (ok1 && ok2);
+}
+
 int test_trim() {
-    printf("Тест Space_trim: ");
-    
     // Обычный пример
     DynamicArray* s1 = str_create_from_cstring("  hello world  ");
     DynamicArray* t1 = str_trim_spaces(s1);
@@ -60,7 +82,6 @@ int test_trim() {
 }
 
 int test_range() {
-    printf("Тест Sub_range: ");
     DynamicArray* s = str_create_from_cstring("012345");
     
     // Обычный пример
@@ -83,7 +104,6 @@ int test_range() {
 }
 
 int test_concat() {
-    printf("Тест Concat: ");
     DynamicArray* a = str_create_from_cstring("Hello");
     DynamicArray* b = str_create_from_cstring("World");
     DynamicArray* res = str_concat(a, b);
@@ -97,8 +117,6 @@ int test_concat() {
 }
 
 int test_several_command() {
-    printf("Тест несколько команд: ");
-    
     DynamicArray* s1 = str_create_from_cstring("Hello");
     DynamicArray* s2 = str_create_from_cstring("World");
     
@@ -118,7 +136,6 @@ int test_several_command() {
 }
 
 int test_cases() {
-    printf("Тест Upper/Lower: ");
     int ok = 1;
 
     // Смешанный текст с цифрами
@@ -148,18 +165,15 @@ int main() {
         SetConsoleOutputCP(65001);
     #endif
 
-    int passed = 0;
-    int total = 5;
-
     printf("==== ЗАПУСК ТЕСТОВ ====\n");
 
-    check(test_trim, &passed);
-    check(test_range, &passed);
-    check(test_concat, &passed);
-    check(test_several_command, &passed);
-    check(test_cases, &passed);
+    check(test_trim, &passed, &failed);
+    check(test_range, &passed, &failed);
+    check(test_concat, &passed, &failed);
+    check(test_several_command, &passed, &failed);
+    check(test_cases, &passed, &failed);
 
-    printf("\n==== ИТОГ: Пройдено %d из %d тестов ====\n", passed, total);
+    printf("\n==== ИТОГ: Пройдено %d из %d тестов ====\n", passed, failed + passed);
     
-    return (passed == total) ? 0 : 1;
+    return (passed == (passed + failed)) ? 0 : 1;
 }

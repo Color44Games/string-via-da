@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
- 
+
 typedef struct FieldInfo {
     size_t elem_size;
     void (*copy) (void* destination, const void* sourse);
