@@ -60,11 +60,13 @@ int main(){
 
     while (command != 0){
         print_menu();
-        if (scanf("%d", &command) != 1){
-            printf("Введен некорректный номер\n");
+        if (scanf("%d", &command) != 1) {
+            printf("Введен некорректный номер команды\n");
+            fflush(stdout);
+            while (getchar() != '\n'); 
+
             continue;
         }
-
         switch(command){
             case 1:
                 printf("Введите строку: ");

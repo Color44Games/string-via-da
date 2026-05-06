@@ -11,9 +11,6 @@
     #include <windows.h>
 #endif
 
-//TODO: Проверка на FieldInfo
-//TODO: Больше тестов
-
 static int passed = 0;
 static int failed = 0;
 
@@ -48,19 +45,115 @@ int test_field_info_copy(){
     const FieldInfo* char_test = get_char_info();
     const FieldInfo* string_test = get_string_info();
 
-    char source_char = 'A';
-    char* source_str = "Abc";
+    const char source_char = 'A';
+    const char* source_str = "Abc";
 
     char destination_char = 'Z';
-    char* destination_str = 'Zyx';
+    char* destination_str = "Zyx";
 
     char_test->copy(&destination_char, &source_char);
     string_test->copy(&destination_str, &source_str);
 
-    int ok1 = verify(str_create_from_cstring(&destination_str), &source_str);
-    int ok2 = verify(str_create_from_cstring(&destination_char), &source_char);
+    int ok1 = (strcmp(destination_str, source_str) == 0);
+    int ok2 = (destination_char == source_char);
 
     return (ok1 && ok2);
+}
+
+int test_field_info_free_elem(){
+    const FieldInfo* char_test = get_char_info();
+    const FieldInfo* string_test = get_string_info();
+    
+    char* str_elem = "ToS";
+
+    string_test->free_elem(&str_elem);
+
+    int ok1 = (char_test->free_elem == NULL);
+    int ok2 = ((&str_elem) == NULL);
+
+    return ok1 && ok2;
+}
+
+int test_field_info_compare(){
+    const FieldInfo* char_test = get_char_info();
+    const FieldInfo* string_test = get_string_info();
+
+    char char_first_elem = 'A';
+    char char_second_elem = 'b';
+    char char_third_elem = 'A';
+
+    char* str_first_elem = "ABC";
+    char* str_second_elem = "123";
+    char* str_third_elem = "abc";
+
+    int compare1 = char_test->compare(&char_first_elem, &char_second_elem);
+    int compare2 = char_test->compare(&char_first_elem, &char_third_elem);
+    int compare3 = char_test->compare(&char_second_elem, &char_third_elem);
+
+    int compare4 = string_test->compare(&str_first_elem, &str_second_elem);
+    int compare5 = string_test->compare(&str_first_elem, &str_third_elem);
+    int compare6 = string_test->compare(&str_second_elem, &str_third_elem);
+
+    int ok1 = (compare1 < 0);
+    int ok2 = (compare2 == 0);
+    int ok3 = (compare3 > 0);
+    int ok4 = (compare4 < 0);
+    int ok5 = (compare5 < 0);
+    int ok6 = (compare6 < 0);
+
+    return ok1 && ok2 && ok3 && ok4 && ok5 && ok6;
+}
+
+int test_field_info_print() {
+    const FieldInfo* char_test = get_char_info();
+    const FieldInfo* string_test = get_string_info();
+
+    char char_elem = 'X';
+    char* str_elem = "Hello"; 
+    char buffer[256] = {0};
+    
+    #ifdef _WIN32
+        freopen("nul", "a", stdout);  
+    #else
+        freopen("/dev/null", "a", stdout);
+    #endif
+    
+    setvbuf(stdout, buffer, _IOFBF, sizeof(buffer));
+    
+    char_test->print(&char_elem);
+    int ok1 = (buffer[0] == 'X');
+    
+    memset(buffer, 0, sizeof(buffer));
+    
+    string_test->print(&str_elem);
+    int ok2 = (strcmp(buffer, "Hello") == 0);
+    
+    #ifdef _WIN32
+        freopen("CON", "w", stdout);
+    #else
+        freopen("/dev/tty", "w", stdout);
+    #endif
+
+    return ok1 && ok2;
+}
+
+int test_field_info_is_separator() {
+    const FieldInfo* char_test = get_char_info();
+    const FieldInfo* string_test = get_string_info();
+
+    char space = ' ';
+    char newline = '\n';
+    char tab = '\t';
+    char letter = 'H';
+    char digit = '5';
+
+    int ok1 = char_test->is_separator(&space);
+    int ok2 = char_test->is_separator(&newline);
+    int ok3 = char_test->is_separator(&tab);
+    int ok4 = !char_test->is_separator(&letter);
+    int ok5 = !char_test->is_separator(&digit);
+
+    return ok1 && ok2 && ok3 && ok4 && ok5;
 }
 
 int test_trim() {
@@ -167,13 +260,18 @@ int main() {
 
     printf("==== ЗАПУСК ТЕСТОВ ====\n");
 
+    check(test_field_info_copy, &passed, &failed);
+    check(test_field_info_free_elem, &passed, &failed);
+    check(test_field_info_compare, &passed, &failed);
+    check(test_field_info_print, &passed, &failed);
+    check(test_field_info_is_separator, &passed, &failed);
     check(test_trim, &passed, &failed);
     check(test_range, &passed, &failed);
     check(test_concat, &passed, &failed);
     check(test_several_command, &passed, &failed);
     check(test_cases, &passed, &failed);
 
-    printf("\n==== ИТОГ: Пройдено %d из %d тестов ====\n", passed, failed + passed);
+    printf("==== ИТОГ: Пройдено %d из %d тестов ====\n", passed, failed + passed);
     
     return (passed == (passed + failed)) ? 0 : 1;
 }
