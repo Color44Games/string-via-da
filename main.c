@@ -11,8 +11,6 @@
     #include <windows.h>
 #endif
 
-//TODO: Переделать меню
-
 static DynamicArray* str_read_from_stdin(){
     int c;
     while ((c = getchar()) != '\n' && c != EOF); 
@@ -36,15 +34,16 @@ static DynamicArray* str_read_from_stdin(){
 }
 
 static void print_menu() {
-    printf("\n==== Управление коллекцией ====\n");
+    printf("\n===== Управление коллекцией =====\n");
     printf("1) Ввести новую строку (создать char-коллекцию)\n");
-    printf("2) Очистить лишние пробелы\n");
-    printf("3) Разбить на слова\n");
+    printf("2) Очистить лишние пробелы (только для char-коллекций)\n");
+    printf("3) Разбить на слова (преобразовать char-коллекцию в string-коллекцию)\n");
     printf("4) Перевести в ВЕРХНИЙ регистр\n");
     printf("5) Перевести в нижний регистр\n");
-    printf("6) Склеить слова в строку символов\n");
+    printf("6) Склеить слова в строку символов (преобразовать string-коллекцию в char-коллекцию)\n");
     printf("7) Взять подстроку\n");
     printf("8) Вывести текущие данные\n");
+    printf("9) Конкатенация\n");
     printf("0) Выход\n");
     printf("Выберите действие: ");
 }
@@ -57,6 +56,7 @@ int main(){
 
     int command = -1;
     DynamicArray* data = NULL;
+    DynamicArray* data_2 = NULL;
 
     while (command != 0){
         print_menu();
@@ -76,7 +76,7 @@ int main(){
                     printf("Не получилось создать коллекцию\n");
                     break;
                 }
-                printf("\nКоллекция создана\n");
+                printf("Коллекция создана\n");
                 break;
             
             case 2:
@@ -164,7 +164,7 @@ int main(){
                 }
                 arr_destroy(data);
                 data = chared;
-                printf("Слова склеены в строку");
+                printf("Слова склеены в строку\n");
                 break;
 
             case 7:
@@ -197,6 +197,36 @@ int main(){
                     printf("Текущий данные (тип %s): ", data->el_type->type_name);
                     str_print(data);
                 }
+                break;
+
+            case 9:
+                if (!data){
+                    printf("Сначала создайте первую коллекцию\n");
+                    break;
+                }
+
+                printf("Введите вторую коллекцию: ");
+                data_2 = str_read_from_stdin();
+                if (!data_2){
+                    arr_destroy(data);
+                    printf("Ошибка при вводе второй коллекции\n");
+                    break;
+                }
+
+                if (is_types_equal(data->el_type, get_string_info())){
+                    data_2 = str_split_to_words(data_2);
+                }
+
+                DynamicArray* concatinated = str_concat(data, data_2);
+                if (!concatinated){
+                    printf("Ошибка при конкатенации\n");
+                    break;
+                }
+
+                arr_destroy(data);
+                arr_destroy(data_2);
+                data = concatinated;
+
                 break;
 
             case 0:

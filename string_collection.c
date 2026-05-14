@@ -7,115 +7,45 @@
 #include <ctype.h>
 #include <stdlib.h>
 
-//TODO: Убрать проверку на тип
-
-static DynamicArray* str_change_case(const DynamicArray* char_arr, int mode){
-    if (!char_arr){
+static DynamicArray* str_change_case(const DynamicArray* arr, int mode){
+    if (!arr){
         fprintf(stderr, "str_to_case error (NULL pointer received)\n");
         return NULL;
     }
 
-    if (!is_types_equal(char_arr->el_type, get_char_info())){
-        fprintf(stderr, "str_to_case error (arr must be char type)\n");
-        return NULL;
-    }
-
-    DynamicArray* res_arr = arr_create(char_arr->el_type, char_arr->curr_size);
+    DynamicArray* res_arr = arr_create(arr->el_type, arr->curr_size);
     if (!res_arr){
         fprintf(stderr, "str_to_case error (arr_create return NULL)\n");
         return NULL;
     }
 
-    for (size_t i = 0; i < char_arr->curr_size; i++){
-        char elem = *(char*)get_elem_arr(char_arr, i);
-        char modified = (mode == 1) ? (char)toupper((unsigned char)elem) : (char)tolower((unsigned char)elem);
-        arr_add_el(res_arr, res_arr->curr_size, &modified);
-    }
-
-    return res_arr;
-}
-
-DynamicArray* str_create_from_cstring(const char* source){
-    if (!source){
-        fprintf(stderr, "str_create_from_cstring error (NULL pointer received)\n");
-        return NULL;
-    }
-
-    size_t str_len = strlen(source);
-    DynamicArray* str_collection = arr_create(get_char_info(), str_len);
-    if (!str_collection){
-        fprintf(stderr, "str_create_from_cstring error (arr_create return NULL)\n");
-        return NULL;
-    }
-
-    for (size_t i = 0; i < str_len; i++){
-        if (!arr_add_el(str_collection, i, &source[i])){
-            arr_destroy(str_collection);
-            return NULL;
+    if (is_types_equal(arr->el_type, get_char_info())){
+        for (size_t i = 0; i < arr->curr_size; i++){
+            char elem = *(char*)get_elem_arr(arr, i);
+            char modified = (mode == 1) ? (char)toupper((unsigned char)elem) : (char)tolower((unsigned char)elem);
+            arr_add_el(res_arr, res_arr->curr_size, &modified);
         }
     }
+    else if (is_types_equal(arr->el_type, get_string_info())){
+        for (size_t i = 0l; i < arr->curr_size; i++){
+            char* original_word = *(char**)get_elem_arr(arr, i);
+            if (!original_word){
+                char* str_null = NULL;
+                arr_add_el(res_arr, i, &str_null);
+                continue;
+            }
 
-    return str_collection;
-}
+            char* modified_word = strdup(original_word);
+            for (size_t j = 0; modified_word[j] != '\0'; j++){
+                modified_word[j] = (mode == 1) ? (char)toupper((unsigned char)modified_word[j]) : (char)tolower((unsigned char)modified_word[j]);
+            }
 
-DynamicArray* str_to_char(const DynamicArray* str_arr){
-    if (!str_arr){
-        fprintf(stderr, "str_to_char error (NULL pointer received)\n");
-        return NULL;
-    }
-
-    if (!is_types_equal(str_arr->el_type, get_string_info())){
-        fprintf(stderr, "str_to_char error (argument must be string type)\n");
-        return NULL;
-    }
-
-    DynamicArray* res_arr = arr_create(get_char_info(), str_arr->curr_size);
-    if (!res_arr){
-        fprintf(stderr, "str_to_char error (arr_create return NULL)\n");
-        return NULL;
-    }
-
-    for (size_t i = 0; i < str_arr ->curr_size; i++){
-        char* word = *(char**)get_elem_arr(str_arr, i);
-        if (!word) continue;
-
-        size_t word_len = strlen(word);
-        for (size_t j = 0; j < word_len; j++){
-            arr_add_el(res_arr, res_arr->curr_size, &word[j]);
-        }
-
-        if (i < str_arr->curr_size - 1){
-            char space = ' ';
-            arr_add_el(res_arr, res_arr->curr_size, &space);
+            arr_add_el(res_arr, res_arr->curr_size, &modified_word);
+            free(modified_word);
         }
     }
 
     return res_arr;
-}
-
-char* str_to_cstring(const DynamicArray* char_arr){
-    if (!char_arr){
-        fprintf(stderr, "str_to_cstring error (NULL pointer received)\n");
-        return NULL;
-    }
-
-    if (!is_types_equal(char_arr->el_type, get_char_info())){
-        fprintf(stderr, "str_to_cstring error (argument must be string type)\n");
-        return NULL;
-    }
-
-    char* res_str = (char*)malloc(char_arr->curr_size + 1);
-    if (!res_str){
-        fprintf(stderr, "str_to_cstring error (malloc failure)\n");
-        return NULL;
-    }
-
-    for (size_t i = 0; i < char_arr->curr_size; i++) {
-        res_str[i] = *(char*)get_elem_arr(char_arr, i);
-    }
-
-    res_str[char_arr->curr_size] = '\0';
-    return res_str;
 }
 
 DynamicArray* str_split_to_words(const DynamicArray* char_arr){
@@ -155,6 +85,36 @@ DynamicArray* str_split_to_words(const DynamicArray* char_arr){
         arr_add_el(res_arr, res_arr->curr_size, &value);
     }
     free(word_buffer);
+
+    return res_arr;
+}
+
+DynamicArray* str_to_char(const DynamicArray* str_arr){
+    if (!str_arr){
+        fprintf(stderr, "str_to_char error (NULL pointer received)\n");
+        return NULL;
+    }
+
+    DynamicArray* res_arr = arr_create(get_char_info(), str_arr->curr_size);
+    if (!res_arr){
+        fprintf(stderr, "str_to_char error (arr_create return NULL)\n");
+        return NULL;
+    }
+
+    for (size_t i = 0; i < str_arr ->curr_size; i++){
+        char* word = *(char**)get_elem_arr(str_arr, i);
+        if (!word) continue;
+
+        size_t word_len = strlen(word);
+        for (size_t j = 0; j < word_len; j++){
+            arr_add_el(res_arr, res_arr->curr_size, &word[j]);
+        }
+
+        if (i < str_arr->curr_size - 1){
+            char space = ' ';
+            arr_add_el(res_arr, res_arr->curr_size, &space);
+        }
+    }
 
     return res_arr;
 }
@@ -267,12 +227,12 @@ DynamicArray* str_trim_spaces(const DynamicArray* char_arr){
     return res_arr;
 }
 
-DynamicArray* str_to_upper(const DynamicArray* char_arr){
-    return str_change_case(char_arr, 1);
+DynamicArray* str_to_upper(const DynamicArray* arr){
+    return str_change_case(arr, 1);
 }
 
-DynamicArray* str_to_lower(const DynamicArray* char_arr){
-    return str_change_case(char_arr, 0);
+DynamicArray* str_to_lower(const DynamicArray* arr){
+    return str_change_case(arr, 0);
 }
 
 void str_print(const DynamicArray* arr){

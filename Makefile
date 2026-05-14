@@ -13,7 +13,7 @@ app: $(OBJ_APP)
 test: $(OBJ_TEST)
 	gcc -g -o test $^
 
-tests.o:
+tests.o: tests.c
 	gcc tests.c -c
 
 main.o: main.c
