@@ -20,7 +20,7 @@ static int verify(const DynamicArray* arr, const char* expected) {
     if (!arr){
         return 0;
     }
-    char* actual = str_to_cstring(arr);
+    char* actual = collection_to_cstring(arr);
     printf("%s", actual);
     int res = (strcmp(actual, expected) == 0);
     if (!res) {
@@ -158,12 +158,12 @@ int test_field_info_is_separator() {
 
 int test_trim() {
     // Обычный пример
-    DynamicArray* s1 = str_create_from_cstring("  hello world  ");
+    DynamicArray* s1 = create_from_cstring("  hello world  ");
     DynamicArray* t1 = str_trim_spaces(s1);
     int ok1 = verify(t1, "hello world");
     
     // Строка только из пробелов
-    DynamicArray* s2 = str_create_from_cstring("   ");
+    DynamicArray* s2 = create_from_cstring("   ");
     DynamicArray* t2 = str_trim_spaces(s2);
     int ok2 = verify(t2, "");
     
@@ -175,7 +175,7 @@ int test_trim() {
 }
 
 int test_range() {
-    DynamicArray* s = str_create_from_cstring("012345");
+    DynamicArray* s = create_from_cstring("012345");
     
     // Обычный пример
     DynamicArray* r1 = str_sub_range(s, 1, 4);
@@ -197,8 +197,8 @@ int test_range() {
 }
 
 int test_concat() {
-    DynamicArray* a = str_create_from_cstring("Hello");
-    DynamicArray* b = str_create_from_cstring("World");
+    DynamicArray* a = create_from_cstring("Hello");
+    DynamicArray* b = create_from_cstring("World");
     DynamicArray* res = str_concat(a, b);
     
     int ok = verify(res, "HelloWorld");
@@ -210,8 +210,8 @@ int test_concat() {
 }
 
 int test_several_command() {
-    DynamicArray* s1 = str_create_from_cstring("Hello");
-    DynamicArray* s2 = str_create_from_cstring("World");
+    DynamicArray* s1 = create_from_cstring("Hello");
+    DynamicArray* s2 = create_from_cstring("World");
     
     // Склеиваем, переводим в верхний регистр, потом берем подстроку
     DynamicArray* c1 = str_concat(s1, s2);       // "HelloWorld"
@@ -232,7 +232,7 @@ int test_cases() {
     int ok = 1;
 
     // Смешанный текст с цифрами
-    DynamicArray* s1 = str_create_from_cstring("123 Hello-World!");
+    DynamicArray* s1 = create_from_cstring("123 Hello-World!");
     DynamicArray* up = str_to_upper(s1);
     DynamicArray* low = str_to_lower(s1);
 
@@ -240,7 +240,7 @@ int test_cases() {
     int ok2 = verify(low, "123 hello-world!");
 
     // Пустая строка
-    DynamicArray* s2 = str_create_from_cstring("");
+    DynamicArray* s2 = create_from_cstring("");
     DynamicArray* up_empty = str_to_upper(s2);
     int ok3 = (up_empty->curr_size == 0);
 

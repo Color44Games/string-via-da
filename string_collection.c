@@ -48,6 +48,54 @@ static DynamicArray* str_change_case(const DynamicArray* arr, int mode){
     return res_arr;
 }
 
+DynamicArray* create_from_cstring(const char* source){
+    if (!source){
+        fprintf(stderr, "str_create_from_cstring error (NULL pointer received)\n");
+        return NULL;
+    }
+
+    size_t str_len = strlen(source);
+    DynamicArray* collection = arr_create(get_char_info(), str_len);
+    if (!collection){
+        fprintf(stderr, "str_create_from_cstring error (arr_create return NULL)\n");
+        return NULL;
+    }
+
+    for (size_t i = 0; i < str_len; i++){
+        if (!arr_add_el(collection, i, &source[i])){
+            arr_destroy(collection);
+            return NULL;
+        }
+    }
+
+    return collection;
+}
+
+char* collection_to_cstring(const DynamicArray* char_arr){
+    if (!char_arr){
+        fprintf(stderr, "str_to_cstring error (NULL pointer received)\n");
+        return NULL;
+    }
+
+    if (!is_types_equal(char_arr->el_type, get_char_info())){
+        fprintf(stderr, "str_to_cstring error (argument must be string type)\n");
+        return NULL;
+    }
+
+    char* res_str = (char*)malloc(char_arr->curr_size + 1);
+    if (!res_str){
+        fprintf(stderr, "str_to_cstring error (malloc failure)\n");
+        return NULL;
+    }
+
+    for (size_t i = 0; i < char_arr->curr_size; i++) {
+        res_str[i] = *(char*)get_elem_arr(char_arr, i);
+    }
+
+    res_str[char_arr->curr_size] = '\0';
+    return res_str;
+}
+
 DynamicArray* str_split_to_words(const DynamicArray* char_arr){
     if (!char_arr){
         fprintf(stderr, "str_split_to_words error (NULL pointer received)\n");

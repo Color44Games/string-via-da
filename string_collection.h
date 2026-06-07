@@ -4,6 +4,9 @@
 #include "field_info.h"
 #include "dynamic_array.h"
 
+DynamicArray* create_from_cstring(const char* source);
+char* collection_to_cstring(const DynamicArray* char_arr);
+
 DynamicArray* str_split_to_words(const DynamicArray* char_arr);
 DynamicArray* str_to_char(const DynamicArray* str_arr);
 
